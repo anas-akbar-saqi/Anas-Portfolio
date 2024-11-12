@@ -1,10 +1,12 @@
 (function ($) {
   "use strict";
-
-  emailjs.init("tNpA8AcX0wdiHPLNX"); // Replace with your EmailJS user ID
-
+  
+  // EmailJS initialization
+  emailjs.init("aTU8Nc-jAP6ZnoP61"); // User ID
+  
   $.fn.conformyEmailValidate = function () {
-    var emailRegexp = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    var emailRegexp =
+      /^(([^<>()\\.,;:\s@"]+(\.[^<>()\\.,;:\s@"]+)*)|(".+"))@(([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3})|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
     return emailRegexp.test(String($(this).val()));
   };
 
@@ -28,9 +30,10 @@
   var contactPhone = $("input[name=contact_phone]");
   var formControl = $(".cf-form-control");
 
+  // Real-time validation handlers
   contactEmail.on("keyup", function () {
     if ($(this).val().trim().length > 0) {
-      if (!$(this).conformyEmailValidate()) {
+      if (!($(this).conformyEmailValidate() === true)) {
         contactEmail.parent().removeClass("success").addClass("error");
       } else {
         contactEmail.parent().removeClass("error").addClass("success");
@@ -42,16 +45,18 @@
 
   contactPhone.on("keyup", function () {
     if ($(this).val().trim().length > 0) {
-      if (!$(this).conformyPhoneValidate()) {
+      if (!($(this).conformyPhoneValidate() === true)) {
         contactPhone.parent().removeClass("success").addClass("error");
       } else {
         contactPhone.parent().removeClass("error").addClass("success");
       }
     } else {
-      contactPhone.parent().removeAttr("class").addClass("error");
+      contactPhone.parent().removeAttr("class");
+      contactPhone.parent().addClass("error");
     }
   });
 
+  // Dropdown validation for subject
   $("select[name=contact_subject]").on("change", function () {
     var item = $(this);
     var sNull = $('select[name="contact_subject"]').find("option").eq(0).val();
@@ -74,7 +79,8 @@
       if ($(this).val().trim().length > 0) {
         $(this).parent().removeClass("error").addClass("success");
       } else {
-        $(this).parent().removeAttr("class").addClass("error");
+        $(this).parent().removeAttr("class");
+        $(this).parent().addClass("error");
       }
     }
   );
@@ -93,7 +99,6 @@
     textCaptcha.val(code);
     textCaptchaSpan.html(code);
   }
-
   randomNumber();
 
   function validateCaptcha() {
@@ -103,7 +108,7 @@
   }
 
   textInput.on("keyup", function () {
-    if (validateCaptcha()) {
+    if (validateCaptcha() === true) {
       $(this).parent().removeClass("error").addClass("success");
     } else {
       $(this).parent().removeAttr("class").addClass("error");
@@ -115,124 +120,77 @@
     var contact_name = $this.find('input[name="contact_name"]').val().trim();
     var contact_email = $this.find('input[name="contact_email"]').val().trim();
     var contact_phone = $this.find('input[name="contact_phone"]').val().trim();
-    var contact_subject = $this
-      .find('select[name="contact_subject"]')
-      .val()
-      .trim();
-    var contact_message = $this
-      .find('textarea[name="contact_message"]')
-      .val()
-      .trim();
-    var validateEmail = $this
-      .find('input[name="contact_email"]')
-      .conformyEmailValidate();
-    var validatePhone = $this
-      .find('input[name="contact_phone"]')
-      .conformyPhoneValidate();
-    var selectedNull = $this
-      .find('select[name="contact_subject"]')
-      .find("option")
-      .eq(0)
-      .val();
+    var contact_subject = $this.find('select[name="contact_subject"]').val().trim();
+    var contact_message = $this.find('textarea[name="contact_message"]').val().trim();
+    var validateEmail = $this.find('input[name="contact_email"]').conformyEmailValidate();
+    var validatePhone = $this.find('input[name="contact_phone"]').conformyPhoneValidate();
+    var selectedNull = $this.find('select[name="contact_subject"]').find("option").eq(0).val();
 
     if (
-      contact_name === "" ||
-      contact_email === "" ||
-      contact_phone === "" ||
-      contact_message === "" ||
-      textInput === "" ||
-      contact_subject === selectedNull
+      contact_name == "" ||
+      contact_email == "" ||
+      contact_phone == "" ||
+      contact_message == "" ||
+      textInput == "" ||
+      contact_subject == selectedNull
     ) {
       $this.find("li").addClass("error");
-      if ($("#empty-form").css("display") === "none") {
+      if ($("#empty-form").css("display") == "none") {
         $("#empty-form").stop().slideDown().delay(3000).slideUp();
       } else {
         return false;
       }
     } else if (!validateEmail) {
-      $('input[name="contact_email"]')
-        .parent()
-        .removeClass("success")
-        .addClass("error");
-      if ($("#email-invalid").css("display") === "none") {
+      $('input[name="contact_email"]').parent().removeClass("success").addClass("error");
+      if ($("#email-invalid").css("display") == "none") {
         $("#email-invalid").stop().slideDown().delay(3000).slideUp();
       } else {
         return false;
       }
-    } else if (contact_subject === selectedNull) {
-      $('select[name="contact_subject"]')
-        .parent()
-        .removeClass("success")
-        .addClass("error");
-      if ($("#subject-alert").css("display") === "none") {
+    } else if (contact_subject == selectedNull) {
+      $('select[name="contact_subject"]').parent().removeClass("success").addClass("error");
+      if ($("#subject-alert").css("display") == "none") {
         $("#subject-alert").stop().slideDown().delay(3000).slideUp();
       } else {
         return false;
       }
     } else if (!validatePhone) {
-      $('input[name="contact_phone"]')
-        .parent()
-        .removeClass("success")
-        .addClass("error");
-      if ($("#phone-invalid").css("display") === "none") {
+      $('input[name="contact_phone"]').parent().removeClass("success").addClass("error");
+      if ($("#phone-invalid").css("display") == "none") {
         $("#phone-invalid").stop().slideDown().delay(3000).slideUp();
       } else {
         return false;
       }
     } else if (!validateCaptcha()) {
-      $("#textInput")
-        .parent()
-        .find("span")
-        .removeClass("success")
-        .addClass("error");
-      if ($("#security-alert").css("display") === "none") {
+      $("#textInput").parent().find("span").removeClass("success").addClass("error");
+      if ($("#security-alert").css("display") == "none") {
         $("#security-alert").stop().slideDown().delay(3000).slideUp();
       } else {
         return false;
       }
     } else {
-      $this
-        .find(":submit")
-        .append('<span class="fas fa-spinner fa-pulse ms-3"></span>');
-      $this.find(":submit").attr("disabled", "true");
-
-      // Send email using EmailJS
-      emailjs
-        .send("service_jyud8vo", "template_i8ky2ve", {
-          contact_name: contact_name,
-          contact_email: contact_email,
-          contact_phone: contact_phone,
-          contact_subject: contact_subject,
-          contact_message: contact_message,
-        })
-        .then(
-          function (response) {
-            $(".cf-form-control").parent().removeAttr("class");
-            $("#contactForm")[0].reset();
-            if (response.status === 200) {
-              $this.find(":submit").removeAttr("disabled");
-              $this.find(":submit").find("span").fadeOut();
-              $("#success_mail").show();
-              $("#success_mail").stop().slideDown().delay(3000).slideUp();
-              randomNumber();
-            } else {
-              $this.find(":submit").removeAttr("disabled");
-              $this.find(":submit").find("span").fadeOut();
-              $("#error_mail").find("p").html(response.text);
-              $("#error_mail").stop().slideDown().delay(3000).slideUp();
-              randomNumber();
-            }
-          },
-          function (error) {
-            $this.find(":submit").removeAttr("disabled");
-            $this.find(":submit").find("span").fadeOut();
-            $("#error_mail").find("p").html(error.text);
-            $("#error_mail").stop().slideDown().delay(3000).slideUp();
-            randomNumber();
-          }
-        );
+      // EmailJS integration
+      emailjs.send("service_6w2jc0n", "template_nsah1l5", {
+        contact_name: contact_name,
+        contact_email: contact_email,
+        contact_phone: contact_phone,
+        contact_subject: contact_subject,
+        contact_message: contact_message,
+      }).then(
+        function(response) {
+          console.log("SUCCESS!", response.status, response.text);
+          $(".cf-form-control").parent().removeAttr("class");
+          $("#contactForm")[0].reset();
+          $("#success_mail").show().stop().slideDown().delay(3000).slideUp();
+          randomNumber();
+        },
+        function(error) {
+          console.log("FAILED...", error);
+          $("#error_mail").find("p").html("An error occurred. Please try again.");
+          $("#error_mail").stop().slideDown().delay(3000).slideUp();
+        }
+      );
     }
-
     event.preventDefault();
     return false;
   });
